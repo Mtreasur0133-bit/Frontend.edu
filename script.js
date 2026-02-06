@@ -9,21 +9,23 @@ document.getElementById("scanBtn").addEventListener("click", async () => {
 
   document.getElementById("status").textContent = "Scanning...";
 
-  const res = await fetch("/api/scan", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ urls }),
-  });
+  try {
+    const res = await fetch("https://url-auditor-real-1.onrender.com/api/scan", {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ urls }),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  const tbody = document.querySelector("#resultsTable tbody");
-  tbody.innerHTML = "";
+    const tbody = document.querySelector("#resultsTable tbody");
+    tbody.innerHTML = "";
 
-  data.results.forEach((r) => {
-    const row = document.createElement("tr");
+    data.results.forEach((r) => {
+      const row = document.createElement("tr");
 
-    row.innerHTML = `
+      row.innerHTML = `
         <td>${r.url}</td>
         <td>${r.status}</td>
         <td class="${r.blocked ? "blocked" : "ok"}">
@@ -31,8 +33,12 @@ document.getElementById("scanBtn").addEventListener("click", async () => {
         </td>
       `;
 
-    tbody.appendChild(row);
-  });
+      tbody.appendChild(row);
+    });
 
-  document.getElementById("status").textContent = "Done.";
+    document.getElementById("status").textContent = "Done.";
+  } catch (err) {
+    console.error("Frontend error:", err);
+    document.getElementById("status").textContent = "Error contacting server.";
+  }
 });
